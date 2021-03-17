@@ -40,16 +40,25 @@ logger = logging.getLogger("my_logger")
 ##################################################
 # Main
 ##################################################
+# Extract tasks from txt
 with open("data/calendar.txt", 'r') as reader:
     tasks = reader.readlines()
+logger.info(f"{len(tasks)} tasks extracted")
 
+# Init Outlook Calendar folder
 app = win32com.client.Dispatch("Outlook.Application")
 my_namespace = app.GetNamespace("MAPI")
 folder = my_namespace.GetDefaultFolder(9).Folders("[Import]") # 9 for Calendar folder
 
+# Clear Outlook Calendar folder
+del_count = 0
 for i in range (folder.Items.Count, 0, -1):
     folder.Items(i).Delete()
+    del_count += 1
+logger.info(f"{del_count} appointments deleted")
 
+# Create appointments
+create_count = 0
 for task in tasks:
     task_name, start, end, cat = task.split(';')
     appt_itm = folder.Items.Add(1) # 1 for AppointmentItem object
@@ -60,5 +69,7 @@ for task in tasks:
     appt_itm.AllDayEvent = True
     appt_itm.ReminderSet = False
     appt_itm.Save()
+    create_count += 1
+logger.info(f"{create_count} appointments created")
 
 finalise_app()
