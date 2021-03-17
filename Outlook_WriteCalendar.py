@@ -44,6 +44,9 @@ app = win32com.client.Dispatch("Outlook.Application")
 my_namespace = app.GetNamespace("MAPI")
 folder = my_namespace.GetDefaultFolder(9).Folders("[Import]") # 9 for Calendar folder
 
+for i in range (folder.Items.Count, 0, -1):
+    folder.Items(i).Delete()
+
 appt_itm = folder.Items.Add(1) # 1 for AppointmentItem object
 appt_itm.Subject = "Test"
 appt_itm.Start = "3/17/2021 12:00:00 AM"
