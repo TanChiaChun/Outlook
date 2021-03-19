@@ -41,7 +41,7 @@ logger = logging.getLogger("my_logger")
 # Main
 ##################################################
 # Extract tasks from txt
-with open("data/calendar.txt", 'r') as reader:
+with open("data/python/calendar.txt", 'r') as reader:
     tasks = reader.readlines()
 logger.info(f"{len(tasks)} tasks extracted")
 
