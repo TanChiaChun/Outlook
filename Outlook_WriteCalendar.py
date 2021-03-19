@@ -30,7 +30,9 @@ logger = logging.getLogger("my_logger")
 ##################################################
 # Variables
 ##################################################
-
+folder = "data/python"
+file_input = "calendar.txt"
+file_output = f"{file_input.split('.')[0]}_output.{file_input.split('.')[1]}"
 
 ##################################################
 # Functions
@@ -41,19 +43,19 @@ logger = logging.getLogger("my_logger")
 # Main
 ##################################################
 # Extract tasks from txt
-with open("data/python/calendar.txt", 'r') as reader:
+with open(f"{folder}/{file_input}", 'r') as reader:
     tasks = reader.readlines()
 logger.info(f"{len(tasks)} tasks extracted")
 
 # Init Outlook Calendar folder
 app = win32com.client.Dispatch("Outlook.Application")
 my_namespace = app.GetNamespace("MAPI")
-folder = my_namespace.GetDefaultFolder(9).Folders("[Import]") # 9 for Calendar folder
+outlook_folder = my_namespace.GetDefaultFolder(9).Folders("[Import]") # 9 for Calendar folder
 
 # Clear Outlook Calendar folder
 del_count = 0
-for i in range (folder.Items.Count, 0, -1):
-    folder.Items(i).Delete()
+for i in range (outlook_folder.Items.Count, 0, -1):
+    outlook_folder.Items(i).Delete()
     del_count += 1
 logger.info(f"{del_count} appointments deleted")
 
@@ -61,7 +63,7 @@ logger.info(f"{del_count} appointments deleted")
 create_count = 0
 for task in tasks:
     task_name, start, end, cat = task.split(';')
-    appt_itm = folder.Items.Add(1) # 1 for AppointmentItem object
+    appt_itm = outlook_folder.Items.Add(1) # 1 for AppointmentItem object
     appt_itm.Subject = task_name
     appt_itm.Start = start
     appt_itm.End = end
@@ -71,5 +73,9 @@ for task in tasks:
     appt_itm.Save()
     create_count += 1
 logger.info(f"{create_count} appointments created")
+
+# Write create_count to txt
+with open(f"{folder}/{file_output}", 'w') as writer:
+    writer.write(str(create_count))
 
 finalise_app()
